@@ -1,0 +1,47 @@
+import time
+import board
+import digitalio
+import usb_hid
+from adafruit_hid.keyboard import Keyboard
+from adafruit_hid.keycode import Keycode
+from adafruit_hid.keyboard_layout_us import KeyboardLayoutUS
+
+keyboard = Keyboard(usb_hid.devices)
+
+# Тильт свитчи
+ts_r = digitalio.DigitalInOut(board.GP19)
+ts_r.switch_to_input(pull=digitalio.Pull.UP)
+
+ts_l = digitalio.DigitalInOut(board.GP0)
+ts_l.switch_to_input(pull=digitalio.Pull.UP)
+
+# Кнопки
+button1 = digitalio.DigitalInOut(board.GP15)
+button2 = digitalio.DigitalInOut(board.GP12)
+button1.switch_to_input(pull=digitalio.Pull.UP)
+button2.switch_to_input(pull=digitalio.Pull.UP)
+
+while True:
+    button_state = button1.value + button2.value
+
+    if button_state >=1:
+        print("PRESSED")
+        keyboard.send(Keycode.G)
+        time.sleep(0.5)
+    else:
+        print("not enough buttons")
+
+# Типа гироскоп
+    if ts_r.value == 0:
+        print("DIRECTION: RIGHT")
+        keyboard.send(Keycode.A)
+        time.sleep(0.5)
+
+    elif ts_l.value == 0:
+        print("DIRECTION: LEFT")
+        keyboard.send(Keycode.D)
+        time.sleep(0.5)
+        
+    elif (ts_l.value == 1 and ts_r.value == 1):
+        print("DIRECTION:")
+        time.sleep(0.5)
